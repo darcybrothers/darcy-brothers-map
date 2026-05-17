@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Darcy Brothers — Wilmington Guide</title>
+  <title>The Darcy Brothers — Wilmington Gym Guide</title>
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
   <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -15,9 +15,7 @@
       --green-mid:   #0d4a08;
       --green-light: #e8f0e7;
       --accent:      #C4622D;
-      --accent-light:#f5ebe4;
       --white:       #ffffff;
-      --off-white:   #f8f8f6;
       --border:      #ddd9d0;
       --text:        #062E03;
       --text-mid:    #3a5237;
@@ -31,10 +29,9 @@
       top: 0; left: 0; right: 0;
       z-index: 100;
       background: var(--green);
-      height: 58px;
+      height: 56px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
       padding: 0 2rem;
     }
 
@@ -46,107 +43,51 @@
       color: var(--white);
     }
 
-    .logo-sub {
-      font-size: 10px;
-      font-weight: 300;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.5);
-      margin-left: 14px;
-    }
-
-    .header-right {
-      font-size: 10px;
-      font-weight: 300;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.45);
-    }
-
     #map {
       position: fixed;
-      top: 58px; left: 0; right: 0; bottom: 0;
+      top: 56px; left: 0; right: 0; bottom: 0;
     }
 
-    /* LEGEND */
-    .legend {
-      position: fixed;
-      bottom: 32px;
-      left: 20px;
-      z-index: 50;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      font-weight: 300;
-      letter-spacing: 0.06em;
-      color: var(--text-mid);
-    }
-
-    .legend-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50% 50% 50% 0;
-      transform: rotate(-45deg);
-      flex-shrink: 0;
-    }
-
-    .legend-dot.gym  { background: var(--green); }
-    .legend-dot.soon { background: #9ab89a; }
-    .legend-dot.run  { background: var(--accent); }
-
-    /* MARKERS */
+    /* MARKER */
     .marker-wrap {
       cursor: pointer;
+      width: 28px;
+      height: 28px;
       position: relative;
     }
 
     .marker-pin {
-      width: 36px;
-      height: 36px;
+      width: 28px;
+      height: 28px;
       border-radius: 50% 50% 50% 0;
       transform: rotate(-45deg);
-      border: 2.5px solid var(--white);
-      box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+      background: var(--green);
+      border: 2px solid var(--white);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.28);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.15s;
+      transition: background 0.15s;
     }
-
-    .marker-pin.gym-reviewed { background: var(--green); }
-    .marker-pin.gym-soon     { background: #9ab89a; }
-    .marker-pin.run-club     { background: var(--accent); }
 
     .marker-wrap:hover .marker-pin,
     .marker-wrap.active .marker-pin {
-      transform: rotate(-45deg) scale(1.14);
+      background: var(--accent);
     }
 
     .marker-letter {
       transform: rotate(45deg);
       color: var(--white);
       font-family: 'Cormorant Garamond', serif;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       line-height: 1;
     }
 
-    /* TOOLTIP */
+    /* TOOLTIP — anchored directly above pin */
     .marker-tooltip {
       position: absolute;
-      bottom: 44px;
+      bottom: calc(100% + 8px);
       left: 50%;
       transform: translateX(-50%);
       background: var(--green);
@@ -154,17 +95,17 @@
       font-family: 'Jost', sans-serif;
       font-size: 12px;
       font-weight: 400;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.03em;
       white-space: nowrap;
-      padding: 5px 11px;
+      padding: 5px 10px;
       border-radius: 6px;
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.15s;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      z-index: 10;
     }
 
-    /* little arrow pointing down from tooltip */
     .marker-tooltip::after {
       content: '';
       position: absolute;
@@ -175,16 +116,10 @@
       border-top-color: var(--green);
     }
 
-    .marker-tooltip.run-tip { background: var(--accent); }
-    .marker-tooltip.run-tip::after { border-top-color: var(--accent); }
-
-    .marker-tooltip.soon-tip { background: #4a7045; }
-    .marker-tooltip.soon-tip::after { border-top-color: #4a7045; }
-
     .marker-wrap:hover .marker-tooltip { opacity: 1; }
 
     /* POPUP */
-    .mapboxgl-popup { max-width: 310px !important; }
+    .mapboxgl-popup { max-width: 300px !important; }
 
     .mapboxgl-popup-content {
       font-family: 'Jost', sans-serif !important;
@@ -199,7 +134,7 @@
     .mapboxgl-popup-tip { display: none !important; }
 
     .mapboxgl-popup-close-button {
-      color: rgba(255,255,255,0.7) !important;
+      color: rgba(255,255,255,0.75) !important;
       font-size: 20px !important;
       top: 10px !important;
       right: 12px !important;
@@ -211,9 +146,6 @@
       background: var(--green);
       padding: 16px 20px 14px;
     }
-
-    .card-header.run  { background: var(--accent); }
-    .card-header.soon { background: #4a7045; }
 
     .card-name {
       font-family: 'Cormorant Garamond', serif;
@@ -282,19 +214,6 @@
       line-height: 1.65;
     }
 
-    .coming-soon-badge {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      background: var(--green-light);
-      color: var(--green);
-      padding: 3px 10px;
-      border-radius: 100px;
-      margin-bottom: 10px;
-    }
-
     .tiktok-btn {
       display: flex;
       align-items: center;
@@ -320,6 +239,20 @@
     .tiktok-btn:hover { background: var(--green-mid); }
     .tiktok-btn svg { width: 14px; height: 14px; fill: white; flex-shrink: 0; }
 
+    .video-soon {
+      margin-top: 14px;
+      width: 100%;
+      padding: 9px 0;
+      background: #f0ede8;
+      color: var(--text-light);
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
     .watermark {
       position: fixed;
       bottom: 18px;
@@ -333,41 +266,30 @@
       z-index: 10;
     }
 
-    .mapboxgl-ctrl-bottom-right { bottom: 32px !important; }
+    .mapboxgl-ctrl-bottom-right { bottom: 28px !important; }
   </style>
 </head>
 <body>
 
 <header>
-  <div style="display:flex;align-items:baseline">
-    <span class="logo">The Darcy Brothers</span>
-    <span class="logo-sub">Wilmington Guide</span>
-  </div>
-  <div class="header-right">Wilmington, NC</div>
+  <span class="logo">The Darcy Brothers</span>
 </header>
 
 <div id="map"></div>
-
-<div class="legend">
-  <div class="legend-item"><div class="legend-dot gym"></div>Reviewed</div>
-  <div class="legend-item"><div class="legend-dot soon"></div>Coming Soon</div>
-  <div class="legend-item"><div class="legend-dot run"></div>Run Club</div>
-</div>
-
 <div class="watermark">thedarcybrothers.com</div>
 
 <script>
-const TOKEN = 'pk.eyJ1IjoiZGFyY3licm90aGVycyIsImEiOiJjbXA4aHE3YXIwamk0MnBwdnVtNWE2d3cyIn0.rs7p2xq5j2rx50IhBDamJQ';
+const TOKEN = 'pk.eyJ1IjoiZGFyY3licm90aGVycyIsImEiOiJjbXA0YjdiZDYwenc2MndwbzJzbnBna3gxIn0.9wgZVc_Xwuy7YYRGNYvWcg';
 const STYLE = 'mapbox://styles/darcybrothers/cmp790prz001l01s1gmxfh4dl';
 
 const TIKTOK_SVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>`;
 
+// Note: Mapbox coords are [longitude, latitude]
 const places = [
   {
     name: "TruFit",
-    area: "Market St · North",
-    coords: [-77.8726, 34.2654],
-    type: "soon",
+    area: "Market St · North Wilmington",
+    coords: [-77.8003931369015, 34.2918354288201],
     pricing: [
       { label: "Tier 1", val: "$30/mo + $70 initiation" },
       { label: "Tier 2", val: "$38/mo" },
@@ -380,8 +302,7 @@ const places = [
   {
     name: "Gym Cube",
     area: "Castle St · Downtown",
-    coords: [-77.9441, 34.2258],
-    type: "reviewed",
+    coords: [-77.928986033212, 34.229013897029674],
     pricing: [
       { label: "Day Pass", val: "$10" },
       { label: "Monthly", val: "$25/mo" }
@@ -393,8 +314,7 @@ const places = [
   {
     name: "Crunch Fitness",
     area: "College Rd · South",
-    coords: [-77.8892, 34.2012],
-    type: "soon",
+    coords: [-77.87893317661478, 34.234729350323626],
     pricing: [
       { label: "Day Pass", val: "Free" },
       { label: "Tier 1", val: "$10/mo" },
@@ -408,8 +328,7 @@ const places = [
   {
     name: "Anytime Fitness",
     area: "Patriot Way · South",
-    coords: [-77.9003, 34.1820],
-    type: "reviewed",
+    coords: [-77.89305371787384, 34.17457763085472],
     pricing: [
       { label: "Day Pass", val: "$15" },
       { label: "Monthly", val: "$49/mo + $50 initiation" }
@@ -421,8 +340,7 @@ const places = [
   {
     name: "Coastal Muscle",
     area: "Carolina Beach Rd · South",
-    coords: [-77.9112, 34.1623],
-    type: "reviewed",
+    coords: [-77.90246857026771, 34.149824288287995],
     pricing: [
       { label: "Day Pass", val: "$15" },
       { label: "Week Pass", val: "$45" },
@@ -436,8 +354,7 @@ const places = [
   {
     name: "Unleashed Fitness",
     area: "Princess St · Downtown",
-    coords: [-77.9512, 34.2318],
-    type: "reviewed",
+    coords: [-77.93489664670619, 34.237225954961396],
     pricing: [
       { label: "Day Pass", val: "$20" },
       { label: "Week Pass", val: "$79" },
@@ -451,8 +368,7 @@ const places = [
   {
     name: "Lakeside Fitness",
     area: "S Kerr Ave · Midtown",
-    coords: [-77.9080, 34.2198],
-    type: "reviewed",
+    coords: [-77.88841475810828, 34.242064016842946],
     pricing: [
       { label: "Day Pass", val: "$20" },
       { label: "Week Pass", val: "$50" },
@@ -466,8 +382,7 @@ const places = [
   {
     name: "O2 Fitness — Independence",
     area: "Independence Blvd · Midtown",
-    coords: [-77.8801, 34.2201],
-    type: "reviewed",
+    coords: [-77.90479424510309, 34.21856443051793],
     pricing: [
       { label: "Tier 1", val: "$74/mo" },
       { label: "Tier 2", val: "$89/mo" }
@@ -479,8 +394,7 @@ const places = [
   {
     name: "O2 Fitness — Racine",
     area: "Racine Dr · Midtown",
-    coords: [-77.8950, 34.2280],
-    type: "reviewed",
+    coords: [-77.86576734670598, 34.24149111537666],
     pricing: [
       { label: "Tier 1", val: "$74/mo" },
       { label: "Tier 2", val: "$89/mo" }
@@ -492,8 +406,7 @@ const places = [
   {
     name: "Fit4Life — Murrayville",
     area: "N College Rd · North",
-    coords: [-77.8810, 34.2780],
-    type: "reviewed",
+    coords: [-77.87228957369298, 34.28761942244479],
     pricing: [
       { label: "Trial", val: "Free 3-day pass" },
       { label: "Monthly", val: "~$40/mo (call to confirm)" }
@@ -505,8 +418,7 @@ const places = [
   {
     name: "Fit4Life — Shipyard",
     area: "Shipyard Blvd · South",
-    coords: [-77.9120, 34.1980],
-    type: "reviewed",
+    coords: [-77.8908892460587, 34.19594177516941],
     pricing: [
       { label: "Trial", val: "Free 3-day pass" },
       { label: "Monthly", val: "~$40/mo (call to confirm)" }
@@ -518,8 +430,7 @@ const places = [
   {
     name: "Axis Fitness",
     area: "N Water St · Downtown",
-    coords: [-77.9468, 34.2358],
-    type: "reviewed",
+    coords: [-77.94995694948489, 34.23766470922299],
     pricing: [
       { label: "Pricing", val: "Not disclosed — call ahead" }
     ],
@@ -530,8 +441,7 @@ const places = [
   {
     name: "Wilmington Run Club",
     area: "Concorde Espresso · South Front St",
-    coords: [-77.9455, 34.2262],
-    type: "run",
+    coords: [-77.9481580653826, 34.23219935401317],
     pricing: [
       { label: "Cost", val: "Free" },
       { label: "Time", val: "6:30am every Friday" },
@@ -544,8 +454,6 @@ const places = [
 ];
 
 function buildCard(p) {
-  const headerClass = p.type === 'run' ? 'run' : p.type === 'soon' ? 'soon' : '';
-
   const pricing = p.pricing.map(r =>
     `<div class="pricing-row">
       <span class="pricing-label">${r.label}</span>
@@ -562,37 +470,40 @@ function buildCard(p) {
     ? `<div class="section-label">Notes</div><div class="card-notes">${p.notes}</div>`
     : '';
 
-  const comingSoon = p.type === 'soon'
-    ? `<div class="coming-soon-badge">Review Coming Soon</div>`
-    : '';
-
-  const videoBtn = p.video
+  const videoSection = p.video
     ? `<a class="tiktok-btn" href="${p.video}" target="_blank" rel="noopener">${TIKTOK_SVG} Watch Our Review</a>`
-    : '';
+    : `<div class="video-soon">Video Coming Soon</div>`;
 
   return `
-    <div class="card-header ${headerClass}">
+    <div class="card-header">
       <div class="card-name">${p.name}</div>
       <div class="card-area">${p.area}</div>
     </div>
     <div class="card-body">
-      ${comingSoon}
       <div class="section-label">Pricing</div>
       ${pricing}
       ${amenities}
       ${notes}
-      ${videoBtn}
+      ${videoSection}
     </div>
   `;
 }
 
 mapboxgl.accessToken = TOKEN;
 
+const WILMINGTON_BOUNDS = [
+  [-78.10, 34.05],
+  [-77.75, 34.40]
+];
+
 const map = new mapboxgl.Map({
   container: 'map',
   style: STYLE,
   center: [-77.9100, 34.2250],
-  zoom: 11.8
+  zoom: 11.8,
+  minZoom: 10.5,
+  maxZoom: 17,
+  maxBounds: WILMINGTON_BOUNDS
 });
 
 map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
@@ -604,21 +515,18 @@ map.on('load', () => {
     const el = document.createElement('div');
     el.className = 'marker-wrap';
 
-    const pinClass  = p.type === 'run' ? 'run-club' : p.type === 'soon' ? 'gym-soon' : 'gym-reviewed';
-    const tipClass  = p.type === 'run' ? 'run-tip'  : p.type === 'soon' ? 'soon-tip'  : '';
-
     el.innerHTML = `
-      <div class="marker-tooltip ${tipClass}">${p.name}</div>
-      <div class="marker-pin ${pinClass}">
+      <div class="marker-tooltip">${p.name}</div>
+      <div class="marker-pin">
         <span class="marker-letter">${p.name.charAt(0)}</span>
       </div>
     `;
 
     const popup = new mapboxgl.Popup({
-      offset: [0, -44],
+      offset: [0, -36],
       closeButton: true,
       closeOnClick: false,
-      maxWidth: '310px'
+      maxWidth: '300px'
     }).setHTML(buildCard(p));
 
     popup.on('open', () => {
