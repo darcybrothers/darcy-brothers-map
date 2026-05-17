@@ -11,15 +11,14 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --green:       #062E03;
-      --green-mid:   #0d4a08;
-      --green-light: #e8f0e7;
-      --accent:      #C4622D;
-      --white:       #ffffff;
-      --border:      #ddd9d0;
-      --text:        #062E03;
-      --text-mid:    #3a5237;
-      --text-light:  #7a9478;
+      --green:     #062E03;
+      --green-mid: #0d4a08;
+      --accent:    #C4622D;
+      --white:     #ffffff;
+      --border:    #ddd9d0;
+      --text:      #062E03;
+      --text-mid:  #3a5237;
+      --text-light:#7a9478;
     }
 
     html, body { height: 100%; font-family: 'Jost', sans-serif; overflow: hidden; }
@@ -48,46 +47,32 @@
       top: 56px; left: 0; right: 0; bottom: 0;
     }
 
-    /* MARKER */
+    /* MARKER WRAP — no transforms, fixed size */
     .marker-wrap {
       cursor: pointer;
-      width: 28px;
-      height: 28px;
       position: relative;
+      width: 30px;
+      height: 40px;
+      /* No transform here — Mapbox anchors to bottom-center */
     }
 
-    .marker-pin {
-      width: 28px;
-      height: 28px;
-      border-radius: 50% 50% 50% 0;
-      transform: rotate(-45deg);
-      background: var(--green);
-      border: 2px solid var(--white);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.28);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.15s;
+    /* SVG pin inside — no CSS rotation, shape is in the SVG itself */
+    .marker-wrap svg.pin-svg {
+      width: 30px;
+      height: 40px;
+      display: block;
+      transition: filter 0.15s;
     }
 
-    .marker-wrap:hover .marker-pin,
-    .marker-wrap.active .marker-pin {
-      background: var(--accent);
+    .marker-wrap:hover svg.pin-svg,
+    .marker-wrap.active svg.pin-svg {
+      filter: brightness(0) saturate(100%) invert(40%) sepia(60%) saturate(600%) hue-rotate(340deg) brightness(90%);
     }
 
-    .marker-letter {
-      transform: rotate(45deg);
-      color: var(--white);
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 13px;
-      font-weight: 600;
-      line-height: 1;
-    }
-
-    /* TOOLTIP — anchored directly above pin */
+    /* TOOLTIP */
     .marker-tooltip {
       position: absolute;
-      bottom: calc(100% + 8px);
+      bottom: calc(100% + 4px);
       left: 50%;
       transform: translateX(-50%);
       background: var(--green);
@@ -191,11 +176,7 @@
     .pricing-label { font-weight: 300; color: var(--text-mid); }
     .pricing-val   { font-weight: 500; color: var(--text); }
 
-    .amenities {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-    }
+    .amenities { display: flex; flex-wrap: wrap; gap: 5px; }
 
     .amenity {
       font-size: 11px;
@@ -237,7 +218,7 @@
     }
 
     .tiktok-btn:hover { background: var(--green-mid); }
-    .tiktok-btn svg { width: 14px; height: 14px; fill: white; flex-shrink: 0; }
+    .tiktok-btn svg.tt { width: 14px; height: 14px; fill: white; flex-shrink: 0; }
 
     .video-soon {
       margin-top: 14px;
@@ -282,9 +263,18 @@
 const TOKEN = 'pk.eyJ1IjoiZGFyY3licm90aGVycyIsImEiOiJjbXA0YjdiZDYwenc2MndwbzJzbnBna3gxIn0.9wgZVc_Xwuy7YYRGNYvWcg';
 const STYLE = 'mapbox://styles/darcybrothers/cmp790prz001l01s1gmxfh4dl';
 
-const TIKTOK_SVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>`;
+// SVG pin shape — anchor point is at the very bottom tip
+// No CSS rotation needed, shape is baked into the SVG path
+function pinSVG(color) {
+  return `<svg class="pin-svg" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
+    <path d="M15 0C7.268 0 1 6.268 1 14c0 9.5 14 26 14 26S29 23.5 29 14C29 6.268 22.732 0 15 0z"
+      fill="${color}" stroke="white" stroke-width="2"/>
+    <circle cx="15" cy="14" r="5" fill="white" opacity="0.9"/>
+  </svg>`;
+}
 
-// Note: Mapbox coords are [longitude, latitude]
+const TIKTOK_SVG = `<svg class="tt" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>`;
+
 const places = [
   {
     name: "TruFit",
@@ -491,10 +481,7 @@ function buildCard(p) {
 
 mapboxgl.accessToken = TOKEN;
 
-const WILMINGTON_BOUNDS = [
-  [-78.10, 34.05],
-  [-77.75, 34.40]
-];
+const WILMINGTON_BOUNDS = [[-78.10, 34.05], [-77.75, 34.40]];
 
 const map = new mapboxgl.Map({
   container: 'map',
@@ -514,16 +501,13 @@ map.on('load', () => {
   places.forEach(p => {
     const el = document.createElement('div');
     el.className = 'marker-wrap';
-
     el.innerHTML = `
       <div class="marker-tooltip">${p.name}</div>
-      <div class="marker-pin">
-        <span class="marker-letter">${p.name.charAt(0)}</span>
-      </div>
+      ${pinSVG('#062E03')}
     `;
 
     const popup = new mapboxgl.Popup({
-      offset: [0, -36],
+      offset: [0, -42],
       closeButton: true,
       closeOnClick: false,
       maxWidth: '300px'
@@ -540,6 +524,7 @@ map.on('load', () => {
       if (activeEl === el) activeEl = null;
     });
 
+    // anchor: 'bottom' tells Mapbox the geographic point is at the bottom of the element
     new mapboxgl.Marker({ element: el, anchor: 'bottom' })
       .setLngLat(p.coords)
       .setPopup(popup)
