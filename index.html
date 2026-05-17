@@ -4,21 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Darcy Brothers — Wilmington Gym Guide</title>
-  <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet" />
-  <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --green:     #062E03;
-      --green-mid: #0d4a08;
-      --accent:    #C4622D;
-      --white:     #ffffff;
-      --border:    #ddd9d0;
-      --text:      #062E03;
-      --text-mid:  #3a5237;
-      --text-light:#7a9478;
+      --green:      #062E03;
+      --green-mid:  #0d4a08;
+      --accent:     #C4622D;
+      --white:      #ffffff;
+      --border:     #ddd9d0;
+      --text:       #062E03;
+      --text-mid:   #3a5237;
+      --text-light: #7a9478;
     }
 
     html, body { height: 100%; font-family: 'Jost', sans-serif; overflow: hidden; }
@@ -47,90 +45,48 @@
       top: 56px; left: 0; right: 0; bottom: 0;
     }
 
-    /* MARKER WRAP — no transforms, fixed size */
-    .marker-wrap {
-      cursor: pointer;
-      position: relative;
-      width: 30px;
-      height: 40px;
-      /* No transform here — Mapbox anchors to bottom-center */
-    }
-
-    /* SVG pin inside — no CSS rotation, shape is in the SVG itself */
-    .marker-wrap svg.pin-svg {
-      width: 30px;
-      height: 40px;
-      display: block;
-      transition: filter 0.15s;
-    }
-
-    .marker-wrap:hover svg.pin-svg,
-    .marker-wrap.active svg.pin-svg {
-      filter: brightness(0) saturate(100%) invert(40%) sepia(60%) saturate(600%) hue-rotate(340deg) brightness(90%);
-    }
-
-    /* TOOLTIP */
-    .marker-tooltip {
-      position: absolute;
-      bottom: calc(100% + 4px);
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--green);
-      color: var(--white);
-      font-family: 'Jost', sans-serif;
-      font-size: 12px;
-      font-weight: 400;
-      letter-spacing: 0.03em;
-      white-space: nowrap;
-      padding: 5px 10px;
-      border-radius: 6px;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      z-index: 10;
-    }
-
-    .marker-tooltip::after {
-      content: '';
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      border: 5px solid transparent;
-      border-top-color: var(--green);
-    }
-
-    .marker-wrap:hover .marker-tooltip { opacity: 1; }
-
-    /* POPUP */
-    .mapboxgl-popup { max-width: 300px !important; }
-
-    .mapboxgl-popup-content {
-      font-family: 'Jost', sans-serif !important;
-      background: var(--white) !important;
-      border: 1px solid var(--border) !important;
-      border-radius: 14px !important;
-      padding: 0 !important;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.14) !important;
+    /* INFO CARD PANEL */
+    .info-panel {
+      display: none;
+      position: fixed;
+      top: 72px;
+      right: 16px;
+      z-index: 200;
+      width: 300px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.14);
       overflow: hidden;
+      max-height: calc(100vh - 88px);
+      overflow-y: auto;
     }
 
-    .mapboxgl-popup-tip { display: none !important; }
+    .info-panel.open { display: block; }
 
-    .mapboxgl-popup-close-button {
-      color: rgba(255,255,255,0.75) !important;
-      font-size: 20px !important;
-      top: 10px !important;
-      right: 12px !important;
-      background: none !important;
-      z-index: 2;
-    }
+    .info-panel::-webkit-scrollbar { width: 3px; }
+    .info-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
     .card-header {
       background: var(--green);
       padding: 16px 20px 14px;
+      position: relative;
     }
+
+    .card-close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      color: rgba(255,255,255,0.7);
+      font-size: 22px;
+      cursor: pointer;
+      line-height: 1;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    .card-close:hover { color: white; }
 
     .card-name {
       font-family: 'Cormorant Garamond', serif;
@@ -218,7 +174,7 @@
     }
 
     .tiktok-btn:hover { background: var(--green-mid); }
-    .tiktok-btn svg.tt { width: 14px; height: 14px; fill: white; flex-shrink: 0; }
+    .tiktok-btn svg { width: 14px; height: 14px; fill: white; flex-shrink: 0; }
 
     .video-soon {
       margin-top: 14px;
@@ -246,8 +202,6 @@
       pointer-events: none;
       z-index: 10;
     }
-
-    .mapboxgl-ctrl-bottom-right { bottom: 28px !important; }
   </style>
 </head>
 <body>
@@ -257,42 +211,31 @@
 </header>
 
 <div id="map"></div>
+<div class="info-panel" id="info-panel">
+  <div id="card-content"></div>
+</div>
 <div class="watermark">thedarcybrothers.com</div>
 
 <script>
-const TOKEN = 'pk.eyJ1IjoiZGFyY3licm90aGVycyIsImEiOiJjbXA0YjdiZDYwenc2MndwbzJzbnBna3gxIn0.9wgZVc_Xwuy7YYRGNYvWcg';
-const STYLE = 'mapbox://styles/darcybrothers/cmp790prz001l01s1gmxfh4dl';
-
-// SVG pin shape — anchor point is at the very bottom tip
-// No CSS rotation needed, shape is baked into the SVG path
-function pinSVG(color) {
-  return `<svg class="pin-svg" viewBox="0 0 30 40" xmlns="http://www.w3.org/2000/svg">
-    <path d="M15 0C7.268 0 1 6.268 1 14c0 9.5 14 26 14 26S29 23.5 29 14C29 6.268 22.732 0 15 0z"
-      fill="${color}" stroke="white" stroke-width="2"/>
-    <circle cx="15" cy="14" r="5" fill="white" opacity="0.9"/>
-  </svg>`;
-}
-
-const TIKTOK_SVG = `<svg class="tt" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>`;
+const TIKTOK_SVG = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>`;
 
 const places = [
   {
     name: "TruFit",
     area: "Market St · North Wilmington",
-    coords: [-77.8003931369015, 34.2918354288201],
+    lat: 34.2918354288201, lng: -77.8003931369015,
     pricing: [
       { label: "Tier 1", val: "$30/mo + $70 initiation" },
       { label: "Tier 2", val: "$38/mo" },
       { label: "Trial", val: "Free 5-day pass" }
     ],
     amenities: ["Sauna", "Red Light Therapy"],
-    notes: null,
-    video: null
+    notes: null, video: null
   },
   {
     name: "Gym Cube",
     area: "Castle St · Downtown",
-    coords: [-77.928986033212, 34.229013897029674],
+    lat: 34.229013897029674, lng: -77.928986033212,
     pricing: [
       { label: "Day Pass", val: "$10" },
       { label: "Monthly", val: "$25/mo" }
@@ -304,21 +247,19 @@ const places = [
   {
     name: "Crunch Fitness",
     area: "College Rd · South",
-    coords: [-77.87893317661478, 34.234729350323626],
+    lat: 34.234729350323626, lng: -77.87893317661478,
     pricing: [
       { label: "Day Pass", val: "Free" },
       { label: "Tier 1", val: "$10/mo" },
       { label: "Tier 2", val: "$25/mo" },
       { label: "Tier 3", val: "$35/mo" }
     ],
-    amenities: [],
-    notes: null,
-    video: null
+    amenities: [], notes: null, video: null
   },
   {
     name: "Anytime Fitness",
     area: "Patriot Way · South",
-    coords: [-77.89305371787384, 34.17457763085472],
+    lat: 34.17457763085472, lng: -77.89305371787384,
     pricing: [
       { label: "Day Pass", val: "$15" },
       { label: "Monthly", val: "$49/mo + $50 initiation" }
@@ -330,7 +271,7 @@ const places = [
   {
     name: "Coastal Muscle",
     area: "Carolina Beach Rd · South",
-    coords: [-77.90246857026771, 34.149824288287995],
+    lat: 34.149824288287995, lng: -77.90246857026771,
     pricing: [
       { label: "Day Pass", val: "$15" },
       { label: "Week Pass", val: "$45" },
@@ -344,7 +285,7 @@ const places = [
   {
     name: "Unleashed Fitness",
     area: "Princess St · Downtown",
-    coords: [-77.93489664670619, 34.237225954961396],
+    lat: 34.237225954961396, lng: -77.93489664670619,
     pricing: [
       { label: "Day Pass", val: "$20" },
       { label: "Week Pass", val: "$79" },
@@ -358,7 +299,7 @@ const places = [
   {
     name: "Lakeside Fitness",
     area: "S Kerr Ave · Midtown",
-    coords: [-77.88841475810828, 34.242064016842946],
+    lat: 34.242064016842946, lng: -77.88841475810828,
     pricing: [
       { label: "Day Pass", val: "$20" },
       { label: "Week Pass", val: "$50" },
@@ -372,7 +313,7 @@ const places = [
   {
     name: "O2 Fitness — Independence",
     area: "Independence Blvd · Midtown",
-    coords: [-77.90479424510309, 34.21856443051793],
+    lat: 34.21856443051793, lng: -77.90479424510309,
     pricing: [
       { label: "Tier 1", val: "$74/mo" },
       { label: "Tier 2", val: "$89/mo" }
@@ -384,7 +325,7 @@ const places = [
   {
     name: "O2 Fitness — Racine",
     area: "Racine Dr · Midtown",
-    coords: [-77.86576734670598, 34.24149111537666],
+    lat: 34.24149111537666, lng: -77.86576734670598,
     pricing: [
       { label: "Tier 1", val: "$74/mo" },
       { label: "Tier 2", val: "$89/mo" }
@@ -396,7 +337,7 @@ const places = [
   {
     name: "Fit4Life — Murrayville",
     area: "N College Rd · North",
-    coords: [-77.87228957369298, 34.28761942244479],
+    lat: 34.28761942244479, lng: -77.87228957369298,
     pricing: [
       { label: "Trial", val: "Free 3-day pass" },
       { label: "Monthly", val: "~$40/mo (call to confirm)" }
@@ -408,7 +349,7 @@ const places = [
   {
     name: "Fit4Life — Shipyard",
     area: "Shipyard Blvd · South",
-    coords: [-77.8908892460587, 34.19594177516941],
+    lat: 34.19594177516941, lng: -77.8908892460587,
     pricing: [
       { label: "Trial", val: "Free 3-day pass" },
       { label: "Monthly", val: "~$40/mo (call to confirm)" }
@@ -420,7 +361,7 @@ const places = [
   {
     name: "Axis Fitness",
     area: "N Water St · Downtown",
-    coords: [-77.94995694948489, 34.23766470922299],
+    lat: 34.23766470922299, lng: -77.94995694948489,
     pricing: [
       { label: "Pricing", val: "Not disclosed — call ahead" }
     ],
@@ -431,7 +372,7 @@ const places = [
   {
     name: "Wilmington Run Club",
     area: "Concorde Espresso · South Front St",
-    coords: [-77.9481580653826, 34.23219935401317],
+    lat: 34.23219935401317, lng: -77.9481580653826,
     pricing: [
       { label: "Cost", val: "Free" },
       { label: "Time", val: "6:30am every Friday" },
@@ -466,6 +407,7 @@ function buildCard(p) {
 
   return `
     <div class="card-header">
+      <button class="card-close" onclick="closePanel()">×</button>
       <div class="card-name">${p.name}</div>
       <div class="card-area">${p.area}</div>
     </div>
@@ -479,62 +421,107 @@ function buildCard(p) {
   `;
 }
 
-mapboxgl.accessToken = TOKEN;
+function closePanel() {
+  document.getElementById('info-panel').classList.remove('open');
+}
 
-const WILMINGTON_BOUNDS = [[-78.10, 34.05], [-77.75, 34.40]];
+function initMap() {
+  const WILMINGTON = { lat: 34.2250, lng: -77.9100 };
 
-const map = new mapboxgl.Map({
-  container: 'map',
-  style: STYLE,
-  center: [-77.9100, 34.2250],
-  zoom: 11.8,
-  minZoom: 10.5,
-  maxZoom: 17,
-  maxBounds: WILMINGTON_BOUNDS
-});
+  // Custom map style — muted, warm, minimal
+  const mapStyles = [
+    { featureType: "all", elementType: "geometry", stylers: [{ saturation: -30 }, { lightness: 10 }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#c8d8e8" }] },
+    { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#f2ede4" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#e8e0d0" }] },
+    { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#d4c8b0" }] },
+    { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#d4e4cc" }] },
+    { featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "transit", elementType: "labels", stylers: [{ visibility: "off" }] },
+    { featureType: "administrative", elementType: "geometry.stroke", stylers: [{ color: "#c8bca8" }] },
+    { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#7a6e60" }] },
+    { featureType: "road", elementType: "labels.text.stroke", stylers: [{ color: "#f2ede4" }] },
+  ];
 
-map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'bottom-right');
+  const map = new google.maps.Map(document.getElementById('map'), {
+    center: WILMINGTON,
+    zoom: 12,
+    minZoom: 11,
+    maxZoom: 17,
+    styles: mapStyles,
+    disableDefaultUI: true,
+    zoomControl: true,
+    zoomControlOptions: {
+      position: google.maps.ControlPosition.RIGHT_BOTTOM
+    },
+    restriction: {
+      latLngBounds: {
+        north: 34.40,
+        south: 34.05,
+        east:  -77.75,
+        west:  -78.10
+      },
+      strictBounds: true
+    }
+  });
 
-let activeEl = null;
+  // Custom pin using Google Maps marker with SVG
+  const pinColor = '#062E03';
+  const pinHoverColor = '#C4622D';
 
-map.on('load', () => {
   places.forEach(p => {
-    const el = document.createElement('div');
-    el.className = 'marker-wrap';
-    el.innerHTML = `
-      <div class="marker-tooltip">${p.name}</div>
-      ${pinSVG('#062E03')}
-    `;
-
-    const popup = new mapboxgl.Popup({
-      offset: [0, -42],
-      closeButton: true,
-      closeOnClick: false,
-      maxWidth: '300px'
-    }).setHTML(buildCard(p));
-
-    popup.on('open', () => {
-      if (activeEl) activeEl.classList.remove('active');
-      el.classList.add('active');
-      activeEl = el;
+    const marker = new google.maps.Marker({
+      position: { lat: p.lat, lng: p.lng },
+      map,
+      title: p.name,
+      icon: {
+        path: 'M12 0C5.373 0 0 5.373 0 12c0 8.25 12 22 12 22S24 20.25 24 12C24 5.373 18.627 0 12 0z',
+        fillColor: pinColor,
+        fillOpacity: 1,
+        strokeColor: '#ffffff',
+        strokeWeight: 1.5,
+        scale: 1.4,
+        anchor: new google.maps.Point(12, 34),
+        labelOrigin: new google.maps.Point(12, 12)
+      },
+      label: {
+        text: p.name.charAt(0),
+        color: '#ffffff',
+        fontFamily: 'Cormorant Garamond, serif',
+        fontSize: '13px',
+        fontWeight: '600'
+      }
     });
 
-    popup.on('close', () => {
-      el.classList.remove('active');
-      if (activeEl === el) activeEl = null;
+    marker.addListener('mouseover', () => {
+      marker.setIcon({
+        ...marker.getIcon(),
+        fillColor: pinHoverColor
+      });
     });
 
-    // anchor: 'bottom' tells Mapbox the geographic point is at the bottom of the element
-    new mapboxgl.Marker({ element: el, anchor: 'bottom' })
-      .setLngLat(p.coords)
-      .setPopup(popup)
-      .addTo(map);
+    marker.addListener('mouseout', () => {
+      marker.setIcon({
+        ...marker.getIcon(),
+        fillColor: pinColor
+      });
+    });
 
-    el.addEventListener('click', () => {
-      map.flyTo({ center: p.coords, zoom: 14, duration: 500 });
+    marker.addListener('click', () => {
+      const panel = document.getElementById('info-panel');
+      document.getElementById('card-content').innerHTML = buildCard(p);
+      panel.classList.add('open');
+      map.panTo({ lat: p.lat, lng: p.lng });
     });
   });
-});
+}
+
+window.initMap = initMap;
 </script>
+
+<script async defer
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAY3H36g7Q7A0FIE5D2enuJRxuhQqH2wS0&callback=initMap">
+</script>
+
 </body>
 </html>
