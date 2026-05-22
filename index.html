@@ -4,24 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>The Darcy Brothers</title>
+  <title>Darcy Brothers</title>
 
-  <meta property="og:title" content="The Darcy Brothers" />
+  <meta property="og:title" content="Darcy Brothers" />
   <meta property="og:url" content="https://darcybrothers.com" />
   <meta property="og:type" content="website" />
-  <meta name="theme-color" content="#062E03" />
+  <meta name="theme-color" content="#0A2310" />
+  <meta property="og:image" content="https://darcybrothers.com/darcybrothers-preview2.jpg" />
 
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
-<style>
+  <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --green:      #062E03;
-      --green-mid:  #0d4a08;
+      --green:      #0A2310;
+      --green-mid:  #12361b;
       --accent:     #C4622D;
       --white:      #ffffff;
       --border:     #ddd9d0;
-      --text:       #062E03;
+      --text:       #0A2310;
       --text-mid:   #3a5237;
       --text-light: #7a9478;
     }
@@ -44,15 +45,15 @@
       font-size: 21px;
       font-weight: 600;
       letter-spacing: 0.04em;
-      color: var(--white);
+      color: #F2F0EF;
     }
 
     #map {
-  width: 100%;
-  height: calc(100vh - 56px);
-  margin-top: 56px;
-  position: relative;
-}
+      width: 100%;
+      height: calc(100vh - 56px);
+      margin-top: 56px;
+      position: relative;
+    }
 
     /* INFO CARD PANEL */
     .info-panel {
@@ -207,7 +208,7 @@
       font-family: 'Cormorant Garamond', serif;
       font-size: 13px;
       letter-spacing: 0.14em;
-      color: rgba(6,46,3,0.25);
+      color: rgba(10,35,16,0.25);
       pointer-events: none;
       z-index: 10;
     }
@@ -216,7 +217,7 @@
 <body>
 
 <header>
-  <span class="logo">The Darcy Brothers</span>
+  <span class="logo">Darcy Brothers</span>
 </header>
 
 <div id="map"></div>
@@ -239,7 +240,8 @@ const places = [
       { label: "Trial", val: "Free 5-day pass" }
     ],
     amenities: ["Sauna", "Red Light Therapy"],
-    notes: null, video: null
+    notes: null, 
+    video: "https://www.tiktok.com/t/ZTB8tphjm/"
   },
   {
     name: "Gym Cube",
@@ -389,7 +391,7 @@ const places = [
     ],
     amenities: ["Community Forward", "3 Mile Route", "Coffee After"],
     notes: "Always a great vibe. Show up, run, connect.",
-    video: "https://www.tiktok.com/t/ZTB1E8fFV/"
+    video: null
   }
 ];
 
@@ -437,7 +439,6 @@ function closePanel() {
 function initMap() {
   const WILMINGTON = { lat: 34.2250, lng: -77.9100 };
 
-  // Custom map style — muted, warm, minimal
   const mapStyles = [
     { featureType: "all", elementType: "geometry", stylers: [{ saturation: -30 }, { lightness: 10 }] },
     { featureType: "water", elementType: "geometry", stylers: [{ color: "#c8d8e8" }] },
@@ -452,7 +453,7 @@ function initMap() {
     { featureType: "road", elementType: "labels.text.stroke", stylers: [{ color: "#f2ede4" }] },
   ];
 
- const map = new google.maps.Map(document.getElementById('map'), {
+  const map = new google.maps.Map(document.getElementById('map'), {
     center: WILMINGTON,
     zoom: 12,
     minZoom: 11,
@@ -475,8 +476,7 @@ function initMap() {
     }
   });
 
-  // Custom pin using Google Maps marker with SVG
-  const pinColor = '#062E03';
+  const pinColor = '#0A2310';
   const pinHoverColor = '#C4622D';
 
   places.forEach(p => {
