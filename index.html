@@ -528,8 +528,8 @@ function initMap() {
 
   const map = new google.maps.Map(document.getElementById('map'), {
     center: WILMINGTON,
-    zoom: 9,        // Changed to 11 to fit the wider view layout perfectly
-    minZoom: 7,     // Adjusted so users can still manually zoom back a step
+    zoom: 10,        // Changed from 11 to 10 so it starts slightly more zoomed out
+    minZoom: 9,      // Lowered from 10 to 9 so users can manually scroll/pinch out further
     maxZoom: 17,
     gestureHandling: 'greedy',
     styles: mapStyles,
@@ -540,10 +540,10 @@ function initMap() {
     },
     restriction: {
       latLngBounds: {
-        north: 34.40,
-        south: 34.05,
-        east:  -77.75,
-        west:  -78.10
+        north: 34.50, // Slightly expanded boundary lines to account for zoom level 9
+        south: 33.95,
+        east:  -77.65,
+        west:  -78.20
       },
       strictBounds: true
     }
