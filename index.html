@@ -419,6 +419,41 @@ const places = [
     video: "https://www.tiktok.com/t/ZP8sJhDWy/"
   },
   {
+    name: "Planet Fitness (Ogden)",
+    area: "Market St · Ogden",
+    lat: 34.260244710510555, lng: -77.82723958168195,
+    pricing: [
+      { label: "Basic Plan", val: "$16/mo" },
+      { label: "Black Card", val: "$25/mo" }
+    ],
+    amenities: ["Showers/Locker Room", "Tanning Bed", "Massage Chairs"],
+    notes: "Nicest planet fitness we’ve ever been to, has free weight barbell racks",
+    video: "https://www.tiktok.com/t/ZTBQpTVFm/"
+  },
+  {
+    name: "Muscle Max",
+    area: "Ocean Hwy · Leland",
+    lat: 34.23563085135213, lng: -77.99593095630718,
+    pricing: [
+      { label: "Tier A Single", val: "$36/mo" },
+      { label: "Tier B Couples/Family", val: "$33/mo" }
+    ],
+    amenities: [],
+    notes: "Decent equipment but tight space, we didnt love the gym tbh but some people really enjoy going there",
+    video: "https://www.tiktok.com/t/ZTBQpT4mN/"
+  },
+  {
+    name: "Ironsmith Barbell",
+    area: "Village Rd · Leland",
+    lat: 34.24826426687258, lng: -78.02636595985882,
+    pricing: [
+      { label: "Memberships", val: "Limited, check website" }
+    ],
+    amenities: [],
+    notes: "",
+    video: null
+  },
+  {
     name: "Wilmington Run Club",
     area: "Drift Coffee · Autumn Hall",
     lat: 34.238542338632385, lng: -77.85281775417722,
@@ -493,8 +528,8 @@ function initMap() {
 
   const map = new google.maps.Map(document.getElementById('map'), {
     center: WILMINGTON,
-    zoom: 11,        // Widened from 12 to 11 to zoom out slightly
-    minZoom: 10,     // Adjusted from 11 to 10 so users can still manually zoom out a bit
+    zoom: 11,        // Changed to 11 to fit the wider view layout perfectly
+    minZoom: 10,     // Adjusted so users can still manually zoom back a step
     maxZoom: 17,
     gestureHandling: 'greedy',
     styles: mapStyles,
